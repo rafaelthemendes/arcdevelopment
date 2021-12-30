@@ -1,5 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
+import Button from "@material-ui/core/Button";
+import logo from "./logo.svg";
+import "./App.css";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         >
           Learn React
         </a>
+        <Button variant="contained">Don't click me! I do nothing =)</Button>
       </header>
     </div>
   );
