@@ -23,5 +23,11 @@ export default createTheme({
       fontFamily: "Raleway",
       textTransform: "none",
     },
+    estimate: {
+      fontFamily: "Pacifico",
+      fontSize: "1rem",
+      textTransform: "none",
+      color: "white",
+    },
   },
 });
