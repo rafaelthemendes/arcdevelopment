@@ -1,11 +1,13 @@
-import React from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   useScrollTrigger,
+  Tabs,
+  Tab,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import React from "react";
+import logo from "../../assets/logo.svg";
 
 function ElevationScroll(props) {
   const { children } = props;
@@ -20,7 +22,18 @@ function ElevationScroll(props) {
 }
 
 const useStyles = makeStyles((theme) => ({
-  toolbarMargin: { ...theme.mixins.toolbar },
+  toolbarMargin: { ...theme.mixins.toolbar, marginBottom: "3em" },
+  logo: {
+    height: "7em",
+  },
+  tabsContainer: {
+    marginLeft: "auto",
+  },
+  tab: {
+    ...theme.typography.tab,
+    minWidth: 10,
+    marginLeft: "25px",
+  },
 }));
 
 export default function Header() {
@@ -29,8 +42,15 @@ export default function Header() {
     <>
       <ElevationScroll>
         <AppBar position="fixed">
-          <Toolbar>
-            <Typography variant="h3">Arc Development</Typography>
+          <Toolbar disableGutters>
+            <img alt="company logo" src={logo} className={classes.logo} />
+            <Tabs className={classes.tabsContainer}>
+              <Tab className={classes.tab} label="Home" />
+              <Tab className={classes.tab} label="Services" />
+              <Tab className={classes.tab} label="The Revolution" />
+              <Tab className={classes.tab} label="About Us" />
+              <Tab className={classes.tab} label="Contact Us" />
+            </Tabs>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
