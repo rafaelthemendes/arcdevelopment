@@ -1,0 +1,9 @@
+export const HOME = "/";
+export const SERVICES = "/services";
+export const CUSTOM_SOFTWARE = "/customsoftware";
+export const MOBILE_APPS = "/mobileapps";
+export const WEBSITES = "/websites";
+export const REVOLUTION = "/revolution";
+export const ABOUT = "/about";
+export const CONTACT = "/contact";
+export const ESTIMATE = "/estimate";
