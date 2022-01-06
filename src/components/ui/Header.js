@@ -52,6 +52,18 @@ const useStyles = makeStyles((theme) => ({
     marginRight: "25px",
     height: "45px",
   },
+  menu: {
+    backgroundColor: theme.palette.common.blue,
+    color: "white",
+    borderRadius: 0,
+  },
+  menuItem: {
+    ...theme.typography.tab,
+    opacity: 0.7,
+    "&:hover": {
+      opacity: 1,
+    },
+  },
 }));
 
 const tabValues = {
@@ -61,6 +73,16 @@ const tabValues = {
   [routes.ABOUT]: 3,
   [routes.CONTACT]: 4,
 };
+
+const menuItems = [
+  { title: "Services", to: routes.SERVICES },
+  {
+    title: "Custom Software Development",
+    to: routes.CUSTOM_SOFTWARE,
+  },
+  { title: "App Development", to: routes.MOBILE_APPS },
+  { title: "Website Development", to: routes.WEBSITES },
+];
 
 export default function Header() {
   const classes = useStyles();
@@ -164,35 +186,20 @@ export default function Header() {
               open={menuOpen}
               onClose={handleMenuClose}
               MenuListProps={{ onMouseLeave: handleMenuClose }}
+              classes={{ paper: classes.menu }}
+              elevation={0}
             >
-              <MenuItem
-                onClick={handleMenuItemClick}
-                component={Link}
-                to={routes.SERVICES}
-              >
-                Services
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuItemClick}
-                component={Link}
-                to={routes.CUSTOM_SOFTWARE}
-              >
-                Custom Software Development
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuItemClick}
-                component={Link}
-                to={routes.MOBILE_APPS}
-              >
-                App Development
-              </MenuItem>
-              <MenuItem
-                onClick={handleMenuItemClick}
-                component={Link}
-                to={routes.WEBSITES}
-              >
-                Website Development
-              </MenuItem>
+              {menuItems.map((menuItem) => (
+                <MenuItem
+                  key={menuItem.title}
+                  onClick={handleMenuItemClick}
+                  component={Link}
+                  to={menuItem.to}
+                  classes={{ root: classes.menuItem }}
+                >
+                  {menuItem.title}
+                </MenuItem>
+              ))}
             </Menu>
           </Toolbar>
         </AppBar>
