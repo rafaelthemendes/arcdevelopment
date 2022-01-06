@@ -1,6 +1,8 @@
 import {
   AppBar,
   Button,
+  Menu,
+  MenuItem,
   Tab,
   Tabs,
   Toolbar,
@@ -64,9 +66,26 @@ export default function Header() {
   const classes = useStyles();
 
   const [tabValue, setTabValue] = useState(tabValues[routes.HOME]);
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChange = (_, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleMenuClick = (event) => {
+    setMenuAnchor(event.currentTarget);
+    setMenuOpen(true);
+  };
+
+  const handleMenuItemClick = () => {
+    handleMenuClose();
+    setTabValue(tabValues[routes.SERVICES]);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -105,10 +124,13 @@ export default function Header() {
                 to={routes.HOME}
               />
               <Tab
+                aria-owns={menuAnchor ? "services-menu" : undefined}
+                aria-haspopup={menuAnchor ? "true" : undefined}
                 className={classes.tab}
                 label="Services"
                 component={Link}
                 to={routes.SERVICES}
+                onMouseOver={handleMenuClick}
               />
               <Tab
                 className={classes.tab}
@@ -136,6 +158,42 @@ export default function Header() {
             >
               Free Estimate
             </Button>
+            <Menu
+              id="services-menu"
+              anchorEl={menuAnchor}
+              open={menuOpen}
+              onClose={handleMenuClose}
+              MenuListProps={{ onMouseLeave: handleMenuClose }}
+            >
+              <MenuItem
+                onClick={handleMenuItemClick}
+                component={Link}
+                to={routes.SERVICES}
+              >
+                Services
+              </MenuItem>
+              <MenuItem
+                onClick={handleMenuItemClick}
+                component={Link}
+                to={routes.CUSTOM_SOFTWARE}
+              >
+                Custom Software Development
+              </MenuItem>
+              <MenuItem
+                onClick={handleMenuItemClick}
+                component={Link}
+                to={routes.MOBILE_APPS}
+              >
+                App Development
+              </MenuItem>
+              <MenuItem
+                onClick={handleMenuItemClick}
+                component={Link}
+                to={routes.WEBSITES}
+              >
+                Website Development
+              </MenuItem>
+            </Menu>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
