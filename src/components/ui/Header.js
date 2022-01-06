@@ -4,7 +4,7 @@ import {
   Tab,
   Tabs,
   Toolbar,
-  useScrollTrigger
+  useScrollTrigger,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const allTabs = {
+const tabValues = {
   [routes.HOME]: 0,
   [routes.SERVICES]: 1,
   [routes.REVOLUTION]: 2,
@@ -63,19 +63,19 @@ const allTabs = {
 export default function Header() {
   const classes = useStyles();
 
-  const [value, setValue] = useState(0);
+  const [tabValue, setTabValue] = useState(tabValues[routes.HOME]);
 
   const handleChange = (_, newValue) => {
-    setValue(newValue);
+    setTabValue(newValue);
   };
 
   useEffect(() => {
-    const tabIndex = allTabs[window.location.pathname];
-    tabIndex !== undefined && setValue(tabIndex);
+    const tabIndex = tabValues[window.location.pathname];
+    tabIndex !== undefined && setTabValue(tabIndex);
   }, []);
 
   const handleClickLogo = () => {
-    setValue(allTabs[routes.HOME]);
+    setTabValue(tabValues[routes.HOME]);
   };
 
   return (
@@ -94,7 +94,7 @@ export default function Header() {
             </Button>
             <Tabs
               className={classes.tabsContainer}
-              value={value}
+              value={tabValue}
               onChange={handleChange}
               indicatorColor="primary"
             >
