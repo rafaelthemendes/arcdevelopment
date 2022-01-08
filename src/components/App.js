@@ -29,7 +29,7 @@ function App() {
           <Route
             exact
             path={routes.WEBSITES}
-            component={() => <div>websites</div>}
+            component={() => <div>Websites</div>}
           />
           <Route
             exact

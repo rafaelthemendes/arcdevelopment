@@ -74,22 +74,47 @@ const tabValues = {
   [routes.CONTACT]: 4,
 };
 
-const menuItems = [
-  { title: "Services", to: routes.SERVICES },
+const menuItemValues = {
+  [routes.SERVICES]: 0,
+  [routes.CUSTOM_SOFTWARE]: 1,
+  [routes.MOBILE_APPS]: 2,
+  [routes.WEBSITES]: 3,
+};
+
+const menuOptions = [
+  { name: "Services", link: routes.SERVICES },
   {
-    title: "Custom Software Development",
-    to: routes.CUSTOM_SOFTWARE,
+    name: "Custom Software Development",
+    link: routes.CUSTOM_SOFTWARE,
   },
-  { title: "App Development", to: routes.MOBILE_APPS },
-  { title: "Website Development", to: routes.WEBSITES },
+  { name: "App Development", link: routes.MOBILE_APPS },
+  { name: "Website Development", link: routes.WEBSITES },
 ];
 
 export default function Header() {
   const classes = useStyles();
 
   const [tabValue, setTabValue] = useState(tabValues[routes.HOME]);
+  const [menuItemValue, setMenuItemValue] = useState(
+    menuItemValues[routes.SERVICES]
+  );
+
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const servicesSelected = tabValue === tabValues[routes.SERVICES];
+
+  useEffect(() => {
+    const tabIndex = tabValues[window.location.pathname];
+    const menuItemIndex = menuItemValues[window.location.pathname];
+
+    if (menuItemIndex !== undefined) {
+      setTabValue(tabValues[routes.SERVICES]);
+      setMenuItemValue(menuItemIndex);
+    } else if (tabIndex !== undefined) {
+      setTabValue(tabIndex);
+    }
+  }, []);
 
   const handleChange = (_, newValue) => {
     setTabValue(newValue);
@@ -100,20 +125,16 @@ export default function Header() {
     setMenuOpen(true);
   };
 
-  const handleMenuItemClick = () => {
+  const handleMenuItemClick = (index) => {
     handleMenuClose();
     setTabValue(tabValues[routes.SERVICES]);
+    setMenuItemValue(index);
   };
 
   const handleMenuClose = () => {
     setMenuAnchor(null);
     setMenuOpen(false);
   };
-
-  useEffect(() => {
-    const tabIndex = tabValues[window.location.pathname];
-    tabIndex !== undefined && setTabValue(tabIndex);
-  }, []);
 
   const handleClickLogo = () => {
     setTabValue(tabValues[routes.HOME]);
@@ -189,15 +210,18 @@ export default function Header() {
               classes={{ paper: classes.menu }}
               elevation={0}
             >
-              {menuItems.map((menuItem) => (
+              {menuOptions.map((menuOption, index) => (
                 <MenuItem
-                  key={menuItem.title}
-                  onClick={handleMenuItemClick}
+                  key={menuOption.name}
+                  onClick={() => handleMenuItemClick(index)}
                   component={Link}
-                  to={menuItem.to}
-                  classes={{ root: classes.menuItem }}
+                  to={menuOption.link}
+                  classes={{
+                    root: classes.menuItem,
+                  }}
+                  selected={servicesSelected && index === menuItemValue}
                 >
-                  {menuItem.title}
+                  {menuOption.name}
                 </MenuItem>
               ))}
             </Menu>
