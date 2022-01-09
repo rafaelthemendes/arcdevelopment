@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@material-ui/core/styles";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import * as routes from "../Routes";
+import Footer from "./ui/Footer";
 import Header from "./ui/Header";
 import theme from "./ui/Theme";
 
@@ -52,6 +53,7 @@ function App() {
             component={() => <div>Estimate</div>}
           />
         </Switch>
+        <Footer />
       </BrowserRouter>
     </ThemeProvider>
   );
