@@ -24,31 +24,60 @@ import classNames from "classnames";
 
 const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-const tabValues = {
-  [routes.HOME]: 0,
-  [routes.SERVICES]: 1,
-  [routes.REVOLUTION]: 2,
-  [routes.ABOUT]: 3,
-  [routes.CONTACT]: 4,
-  [routes.ESTIMATE]: 5,
+const routesOptions = {
+  [routes.HOME]: { name: "Home", link: routes.HOME, activeIndex: 0 },
+  [routes.SERVICES]: {
+    name: "Services",
+    link: routes.SERVICES,
+    activeIndex: 1,
+  },
+  [routes.REVOLUTION]: {
+    name: "The Revolution",
+    link: routes.REVOLUTION,
+    activeIndex: 2,
+  },
+  [routes.ABOUT]: { name: "About Us", link: routes.ABOUT, activeIndex: 3 },
+  [routes.CONTACT]: {
+    name: "Contact Us",
+    link: routes.CONTACT,
+    activeIndex: 4,
+  },
+  [routes.ESTIMATE]: {
+    name: "Free Estimate",
+    link: routes.ESTIMATE,
+    activeIndex: 5,
+  },
 };
 
-const menuItemValues = {
-  [routes.SERVICES]: 0,
-  [routes.CUSTOM_SOFTWARE]: 1,
-  [routes.MOBILE_APPS]: 2,
-  [routes.WEBSITES]: 3,
-};
-
-const menuOptions = [
-  { name: "Services", link: routes.SERVICES },
-  {
+const menuRoutesOptions = {
+  [routes.SERVICES]: {
+    name: "Services",
+    link: routes.SERVICES,
+    activeIndex: 0,
+  },
+  [routes.CUSTOM_SOFTWARE]: {
     name: "Custom Software Development",
     link: routes.CUSTOM_SOFTWARE,
+    activeIndex: 1,
   },
-  { name: "App Development", link: routes.MOBILE_APPS },
-  { name: "Website Development", link: routes.WEBSITES },
-];
+  [routes.MOBILE_APPS]: {
+    name: "App Development",
+    link: routes.MOBILE_APPS,
+    activeIndex: 2,
+  },
+  [routes.WEBSITES]: {
+    name: "Website Development",
+    link: routes.WEBSITES,
+    activeIndex: 3,
+  },
+};
+
+const homeIndex = routesOptions[routes.HOME].activeIndex;
+const servicesIndex = routesOptions[routes.SERVICES].activeIndex;
+const servicesMenuIndex = menuRoutesOptions[routes.SERVICES].activeIndex;
+
+const routesOptionsValues = Object.values(routesOptions);
+const menuRoutesOptionsValues = Object.values(menuRoutesOptions);
 
 const useStyles = makeStyles((theme) => ({
   toolbarMargin: {
@@ -134,31 +163,29 @@ export default function Header() {
   const theme = useTheme();
   const screenDownMd = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [tabValue, setTabValue] = useState(tabValues[routes.HOME]);
-  const [menuItemValue, setMenuItemValue] = useState(
-    menuItemValues[routes.SERVICES]
-  );
+  const [routeIndex, setRouteIndex] = useState(homeIndex);
+  const [menuRouteIndex, setMenuRouteIndex] = useState(servicesMenuIndex);
 
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const servicesSelected = tabValue === tabValues[routes.SERVICES];
+  const servicesSelected = routeIndex === servicesIndex;
 
   useEffect(() => {
-    const tabIndex = tabValues[window.location.pathname];
-    const menuItemIndex = menuItemValues[window.location.pathname];
+    const routeOption = routesOptions[window.location.pathname];
+    const menuRouteOption = menuRoutesOptions[window.location.pathname];
 
-    if (menuItemIndex !== undefined) {
-      setTabValue(tabValues[routes.SERVICES]);
-      setMenuItemValue(menuItemIndex);
-    } else if (tabIndex !== undefined) {
-      setTabValue(tabIndex);
+    if (menuRouteOption) {
+      setRouteIndex(servicesIndex);
+      setMenuRouteIndex(menuRouteOption.activeIndex);
+    } else if (routeOption) {
+      setRouteIndex(routeOption.activeIndex);
     }
   }, []);
 
-  const handleChange = (_, newValue) => {
-    setTabValue(newValue);
+  const handleTabChange = (_, newValue) => {
+    setRouteIndex(newValue);
   };
 
   const handleMenuClick = (event) => {
@@ -168,8 +195,8 @@ export default function Header() {
 
   const handleMenuItemClick = (index) => {
     handleMenuClose();
-    setTabValue(tabValues[routes.SERVICES]);
-    setMenuItemValue(index);
+    setRouteIndex(servicesIndex);
+    setMenuRouteIndex(index);
   };
 
   const handleMenuClose = () => {
@@ -179,54 +206,91 @@ export default function Header() {
 
   const handleDrawerItemClick = (index) => {
     setDrawerOpen(false);
-    setTabValue(index);
+    setRouteIndex(index);
   };
 
   const handleClickLogo = () => {
-    setTabValue(tabValues[routes.HOME]);
+    setRouteIndex(homeIndex);
+  };
+
+  const renderTab = (routeOption) => {
+    const servicesTabExtraProps = {
+      ...(routeOption.link === routes.SERVICES && {
+        onMouseOver: handleMenuClick,
+        "aria-owns": menuAnchor ? "services-menu" : undefined,
+        "aria-haspopup": menuAnchor ? "true" : undefined,
+      }),
+    };
+    return (
+      <Tab
+        key={routeOption.name}
+        className={classes.tab}
+        label={routeOption.name}
+        component={Link}
+        to={routeOption.link}
+        {...servicesTabExtraProps}
+      />
+    );
+  };
+
+  const renderListItem = (routeOption) => {
+    const selected = routeOption.activeIndex === routeIndex;
+    const estimateRouteExtraProps = {
+      ...(routeOption.link === routes.ESTIMATE && {
+        className: classes.drawerItemEstimate,
+      }),
+    };
+    return (
+      <ListItem
+        key={routeOption.name}
+        divider
+        button
+        component={Link}
+        to={routeOption.link}
+        selected={selected}
+        onClick={() => handleDrawerItemClick(routeOption.activeIndex)}
+        {...estimateRouteExtraProps}
+      >
+        <ListItemText
+          disableTypography
+          className={classNames(classes.drawerItem, {
+            [classes.drawerItemSelected]: selected,
+          })}
+        >
+          {routeOption.name}
+        </ListItemText>
+      </ListItem>
+    );
+  };
+
+  const renderMenuItem = (menuRouteOption) => {
+    const selected =
+      servicesSelected && menuRouteOption.activeIndex === menuRouteIndex;
+    return (
+      <MenuItem
+        key={menuRouteOption.name}
+        onClick={() => handleMenuItemClick(menuRouteOption.activeIndex)}
+        component={Link}
+        to={menuRouteOption.link}
+        selected={selected}
+        classes={{
+          root: classes.menuItem,
+        }}
+      >
+        {menuRouteOption.name}
+      </MenuItem>
+    );
   };
 
   const tabs = (
     <>
       <Tabs
         className={classes.tabsContainer}
-        value={tabValue}
-        onChange={handleChange}
+        value={routeIndex}
+        onChange={handleTabChange}
         indicatorColor="primary"
       >
-        <Tab
-          className={classes.tab}
-          label="Home"
-          component={Link}
-          to={routes.HOME}
-        />
-        <Tab
-          aria-owns={menuAnchor ? "services-menu" : undefined}
-          aria-haspopup={menuAnchor ? "true" : undefined}
-          className={classes.tab}
-          label="Services"
-          component={Link}
-          to={routes.SERVICES}
-          onMouseOver={handleMenuClick}
-        />
-        <Tab
-          className={classes.tab}
-          label="The Revolution"
-          component={Link}
-          to={routes.REVOLUTION}
-        />
-        <Tab
-          className={classes.tab}
-          label="About Us"
-          component={Link}
-          to={routes.ABOUT}
-        />
-        <Tab
-          className={classes.tab}
-          label="Contact Us"
-          component={Link}
-          to={routes.CONTACT}
-        />
+        {routesOptionsValues.map(renderTab)}
       </Tabs>
       <Button
         variant="contained"
@@ -245,21 +309,9 @@ export default function Header() {
         MenuListProps={{ onMouseLeave: handleMenuClose }}
         classes={{ paper: classes.menu }}
         elevation={0}
+        keepMounted
       >
-        {menuOptions.map((menuOption, index) => (
-          <MenuItem
-            key={menuOption.name}
-            onClick={() => handleMenuItemClick(index)}
-            component={Link}
-            to={menuOption.link}
-            classes={{
-              root: classes.menuItem,
-            }}
-            selected={servicesSelected && index === menuItemValue}
-          >
-            {menuOption.name}
-          </MenuItem>
-        ))}
+        {menuRoutesOptionsValues.map(renderMenuItem)}
       </Menu>
     </>
   );
@@ -274,117 +326,7 @@ export default function Header() {
         onClose={() => setDrawerOpen(false)}
         classes={{ paper: classes.drawer }}
       >
-        <List disablePadding>
-          <ListItem
-            divider
-            button
-            component={Link}
-            to={routes.HOME}
-            selected={tabValue === tabValues[routes.HOME]}
-            onClick={() => handleDrawerItemClick(tabValues[routes.HOME])}
-          >
-            <ListItemText
-              className={classNames(classes.drawerItem, {
-                [classes.drawerItemSelected]:
-                  tabValue === tabValues[routes.HOME],
-              })}
-              disableTypography
-            >
-              Home
-            </ListItemText>
-          </ListItem>
-          <ListItem
-            divider
-            button
-            component={Link}
-            to={routes.SERVICES}
-            selected={tabValue === tabValues[routes.SERVICES]}
-            onClick={() => handleDrawerItemClick(tabValues[routes.SERVICES])}
-          >
-            <ListItemText
-              className={classNames(classes.drawerItem, {
-                [classes.drawerItemSelected]:
-                  tabValue === tabValues[routes.SERVICES],
-              })}
-              disableTypography
-            >
-              Services
-            </ListItemText>
-          </ListItem>
-          <ListItem
-            divider
-            button
-            component={Link}
-            to={routes.REVOLUTION}
-            selected={tabValue === tabValues[routes.REVOLUTION]}
-            onClick={() => handleDrawerItemClick(tabValues[routes.REVOLUTION])}
-          >
-            <ListItemText
-              className={classNames(classes.drawerItem, {
-                [classes.drawerItemSelected]:
-                  tabValue === tabValues[routes.REVOLUTION],
-              })}
-              disableTypography
-            >
-              The Revolution
-            </ListItemText>
-          </ListItem>
-          <ListItem
-            divider
-            button
-            component={Link}
-            to={routes.ABOUT}
-            selected={tabValue === tabValues[routes.ABOUT]}
-            onClick={() => handleDrawerItemClick(tabValues[routes.ABOUT])}
-          >
-            <ListItemText
-              className={classNames(classes.drawerItem, {
-                [classes.drawerItemSelected]:
-                  tabValue === tabValues[routes.ABOUT],
-              })}
-              disableTypography
-            >
-              About Us
-            </ListItemText>
-          </ListItem>
-          <ListItem
-            divider
-            button
-            component={Link}
-            to={routes.CONTACT}
-            selected={tabValue === tabValues[routes.CONTACT]}
-            onClick={() => handleDrawerItemClick(tabValues[routes.CONTACT])}
-          >
-            <ListItemText
-              className={classNames(classes.drawerItem, {
-                [classes.drawerItemSelected]:
-                  tabValue === tabValues[routes.CONTACT],
-              })}
-              disableTypography
-            >
-              Contact Us
-            </ListItemText>
-          </ListItem>
-          <ListItem
-            className={classes.drawerItemEstimate}
-            divider
-            button
-            component={Link}
-            to={routes.ESTIMATE}
-            selected={tabValue === tabValues[routes.ESTIMATE]}
-            onClick={() => handleDrawerItemClick(tabValues[routes.ESTIMATE])}
-          >
-            <ListItemText
-              className={classNames(classes.drawerItem, {
-                [classes.drawerItemSelected]:
-                  tabValue === tabValues[routes.ESTIMATE],
-              })}
-              disableTypography
-            >
-              Free Estimate
-            </ListItemText>
-          </ListItem>
-        </List>
+        <List disablePadding>{routesOptionsValues.map(renderListItem)}</List>
       </SwipeableDrawer>
       <IconButton
         className={classes.drawerIconContainer}
