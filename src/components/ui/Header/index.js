@@ -7,6 +7,11 @@ import {
   Tabs,
   Toolbar,
   useMediaQuery,
+  SwipeableDrawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
@@ -14,31 +19,65 @@ import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.svg";
 import * as routes from "../../../Routes";
 import ElevationScroll from "./ElevationScroll";
+import MenuIcon from "@material-ui/icons/Menu";
+import classNames from "classnames";
 
-const tabValues = {
-  [routes.HOME]: 0,
-  [routes.SERVICES]: 1,
-  [routes.REVOLUTION]: 2,
-  [routes.ABOUT]: 3,
-  [routes.CONTACT]: 4,
+const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+const routesOptions = {
+  [routes.HOME]: { name: "Home", link: routes.HOME, activeIndex: 0 },
+  [routes.SERVICES]: {
+    name: "Services",
+    link: routes.SERVICES,
+    activeIndex: 1,
+  },
+  [routes.REVOLUTION]: {
+    name: "The Revolution",
+    link: routes.REVOLUTION,
+    activeIndex: 2,
+  },
+  [routes.ABOUT]: { name: "About Us", link: routes.ABOUT, activeIndex: 3 },
+  [routes.CONTACT]: {
+    name: "Contact Us",
+    link: routes.CONTACT,
+    activeIndex: 4,
+  },
+  [routes.ESTIMATE]: {
+    name: "Free Estimate",
+    link: routes.ESTIMATE,
+    activeIndex: 5,
+  },
 };
 
-const menuItemValues = {
-  [routes.SERVICES]: 0,
-  [routes.CUSTOM_SOFTWARE]: 1,
-  [routes.MOBILE_APPS]: 2,
-  [routes.WEBSITES]: 3,
-};
-
-const menuOptions = [
-  { name: "Services", link: routes.SERVICES },
-  {
+const menuRoutesOptions = {
+  [routes.SERVICES]: {
+    name: "Services",
+    link: routes.SERVICES,
+    activeIndex: 0,
+  },
+  [routes.CUSTOM_SOFTWARE]: {
     name: "Custom Software Development",
     link: routes.CUSTOM_SOFTWARE,
+    activeIndex: 1,
   },
-  { name: "App Development", link: routes.MOBILE_APPS },
-  { name: "Website Development", link: routes.WEBSITES },
-];
+  [routes.MOBILE_APPS]: {
+    name: "App Development",
+    link: routes.MOBILE_APPS,
+    activeIndex: 2,
+  },
+  [routes.WEBSITES]: {
+    name: "Website Development",
+    link: routes.WEBSITES,
+    activeIndex: 3,
+  },
+};
+
+const homeIndex = routesOptions[routes.HOME].activeIndex;
+const servicesIndex = routesOptions[routes.SERVICES].activeIndex;
+const servicesMenuIndex = menuRoutesOptions[routes.SERVICES].activeIndex;
+
+const routesOptionsValues = Object.values(routesOptions);
+const menuRoutesOptionsValues = Object.values(menuRoutesOptions);
 
 const useStyles = makeStyles((theme) => ({
   toolbarMargin: {
@@ -93,38 +132,63 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
+  drawerIconContainer: {
+    marginLeft: "auto",
+    "&:hover": {
+      backgroundColor: "transparent",
+    },
+  },
+  drawerIcon: {
+    height: "50px",
+    width: "50px",
+  },
+  drawer: {
+    backgroundColor: theme.palette.common.blue,
+  },
+  drawerItem: {
+    ...theme.typography.tab,
+    color: "white",
+    opacity: 0.7,
+  },
+  drawerItemSelected: {
+    opacity: 1,
+  },
+  drawerItemEstimate: {
+    backgroundColor: theme.palette.common.orange,
+  },
+  appBar: {
+    zIndex: theme.zIndex.modal + 1,
+  },
 }));
 
 export default function Header() {
   const classes = useStyles();
   const theme = useTheme();
-  const screenMatchesDownMd = useMediaQuery(theme.breakpoints.down("md"));
+  const screenDownMd = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [tabValue, setTabValue] = useState(tabValues[routes.HOME]);
-  const [menuItemValue, setMenuItemValue] = useState(
-    menuItemValues[routes.SERVICES]
-  );
+  const [routeIndex, setRouteIndex] = useState(homeIndex);
+  const [menuRouteIndex, setMenuRouteIndex] = useState(servicesMenuIndex);
 
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const servicesSelected = tabValue === tabValues[routes.SERVICES];
-  const showTabs = !screenMatchesDownMd;
+  const servicesSelected = routeIndex === servicesIndex;
 
   useEffect(() => {
-    const tabIndex = tabValues[window.location.pathname];
-    const menuItemIndex = menuItemValues[window.location.pathname];
+    const routeOption = routesOptions[window.location.pathname];
+    const menuRouteOption = menuRoutesOptions[window.location.pathname];
 
-    if (menuItemIndex !== undefined) {
-      setTabValue(tabValues[routes.SERVICES]);
-      setMenuItemValue(menuItemIndex);
-    } else if (tabIndex !== undefined) {
-      setTabValue(tabIndex);
+    if (menuRouteOption) {
+      setRouteIndex(servicesIndex);
+      setMenuRouteIndex(menuRouteOption.activeIndex);
+    } else if (routeOption) {
+      setRouteIndex(routeOption.activeIndex);
     }
   }, []);
 
-  const handleChange = (_, newValue) => {
-    setTabValue(newValue);
+  const handleTabChange = (_, newValue) => {
+    setRouteIndex(newValue);
   };
 
   const handleMenuClick = (event) => {
@@ -134,8 +198,8 @@ export default function Header() {
 
   const handleMenuItemClick = (index) => {
     handleMenuClose();
-    setTabValue(tabValues[routes.SERVICES]);
-    setMenuItemValue(index);
+    setRouteIndex(servicesIndex);
+    setMenuRouteIndex(index);
   };
 
   const handleMenuClose = () => {
@@ -143,53 +207,101 @@ export default function Header() {
     setMenuOpen(false);
   };
 
+  const handleDrawerItemClick = (index) => {
+    setDrawerOpen(false);
+    setRouteIndex(index);
+  };
+
   const handleClickLogo = () => {
-    setTabValue(tabValues[routes.HOME]);
+    setRouteIndex(homeIndex);
+  };
+
+  const renderTab = (routeOption) => {
+    const servicesTabExtraProps = {
+      ...(routeOption.link === routes.SERVICES && {
+        onMouseOver: handleMenuClick,
+        "aria-owns": menuAnchor ? "services-menu" : undefined,
+        "aria-haspopup": menuAnchor ? "true" : undefined,
+      }),
+    };
+    return (
+      <Tab
+        key={routeOption.name}
+        className={classes.tab}
+        label={routeOption.name}
+        component={Link}
+        to={routeOption.link}
+        {...servicesTabExtraProps}
+      />
+    );
+  };
+
+  const renderListItem = (routeOption) => {
+    const selected = routeOption.activeIndex === routeIndex;
+    const estimateRouteExtraProps = {
+      ...(routeOption.link === routes.ESTIMATE && {
+        className: classes.drawerItemEstimate,
+      }),
+    };
+    return (
+      <ListItem
+        key={routeOption.name}
+        divider
+        button
+        component={Link}
+        to={routeOption.link}
+        selected={selected}
+        onClick={() => handleDrawerItemClick(routeOption.activeIndex)}
+        {...estimateRouteExtraProps}
+      >
+        <ListItemText
+          disableTypography
+          className={classNames(classes.drawerItem, {
+            [classes.drawerItemSelected]: selected,
+          })}
+        >
+          {routeOption.name}
+        </ListItemText>
+      </ListItem>
+    );
+  };
+
+  const renderMenuItem = (menuRouteOption) => {
+    const selected =
+      servicesSelected && menuRouteOption.activeIndex === menuRouteIndex;
+    return (
+      <MenuItem
+        key={menuRouteOption.name}
+        onClick={() => handleMenuItemClick(menuRouteOption.activeIndex)}
+        component={Link}
+        to={menuRouteOption.link}
+        selected={selected}
+        classes={{
+          root: classes.menuItem,
+        }}
+      >
+        {menuRouteOption.name}
+      </MenuItem>
+    );
   };
 
   const tabs = (
     <>
       <Tabs
         className={classes.tabsContainer}
-        value={tabValue}
-        onChange={handleChange}
+        value={routeIndex}
+        onChange={handleTabChange}
         indicatorColor="primary"
       >
-        <Tab
-          className={classes.tab}
-          label="Home"
-          component={Link}
-          to={routes.HOME}
-        />
-        <Tab
-          aria-owns={menuAnchor ? "services-menu" : undefined}
-          aria-haspopup={menuAnchor ? "true" : undefined}
-          className={classes.tab}
-          label="Services"
-          component={Link}
-          to={routes.SERVICES}
-          onMouseOver={handleMenuClick}
-        />
-        <Tab
-          className={classes.tab}
-          label="The Revolution"
-          component={Link}
-          to={routes.REVOLUTION}
-        />
-        <Tab
-          className={classes.tab}
-          label="About Us"
-          component={Link}
-          to={routes.ABOUT}
-        />
-        <Tab
-          className={classes.tab}
-          label="Contact Us"
-          component={Link}
-          to={routes.CONTACT}
-        />
+        {routesOptionsValues.map(renderTab)}
       </Tabs>
-      <Button variant="contained" color="secondary" className={classes.button}>
+      <Button
+        variant="contained"
+        color="secondary"
+        className={classes.button}
+        component={Link}
+        to={routes.ESTIMATE}
+      >
         Free Estimate
       </Button>
       <Menu
@@ -200,29 +312,40 @@ export default function Header() {
         MenuListProps={{ onMouseLeave: handleMenuClose }}
         classes={{ paper: classes.menu }}
         elevation={0}
+        keepMounted
+        style={{ zIndex: 1302 }}
       >
-        {menuOptions.map((menuOption, index) => (
-          <MenuItem
-            key={menuOption.name}
-            onClick={() => handleMenuItemClick(index)}
-            component={Link}
-            to={menuOption.link}
-            classes={{
-              root: classes.menuItem,
-            }}
-            selected={servicesSelected && index === menuItemValue}
-          >
-            {menuOption.name}
-          </MenuItem>
-        ))}
+        {menuRoutesOptionsValues.map(renderMenuItem)}
       </Menu>
+    </>
+  );
+
+  const drawer = (
+    <>
+      <SwipeableDrawer
+        disableBackdropTransition={!iOS}
+        disableDiscovery={iOS}
+        open={drawerOpen}
+        onOpen={() => setDrawerOpen(true)}
+        onClose={() => setDrawerOpen(false)}
+        classes={{ paper: classes.drawer }}
+      >
+        <div className={classes.toolbarMargin} />
+        <List disablePadding>{routesOptionsValues.map(renderListItem)}</List>
+      </SwipeableDrawer>
+      <IconButton
+        className={classes.drawerIconContainer}
+        onClick={() => setDrawerOpen(!drawerOpen)}
+      >
+        <MenuIcon className={classes.drawerIcon} />
+      </IconButton>
     </>
   );
 
   return (
     <>
       <ElevationScroll>
-        <AppBar position="fixed">
+        <AppBar position="fixed" className={classes.appBar}>
           <Toolbar disableGutters>
             <Button
               disableRipple
@@ -233,7 +356,7 @@ export default function Header() {
             >
               <img alt="company logo" src={logo} className={classes.logo} />
             </Button>
-            {showTabs && tabs}
+            {screenDownMd ? drawer : tabs}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
