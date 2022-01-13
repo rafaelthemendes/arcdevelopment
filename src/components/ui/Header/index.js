@@ -156,6 +156,9 @@ const useStyles = makeStyles((theme) => ({
   drawerItemEstimate: {
     backgroundColor: theme.palette.common.orange,
   },
+  appBar: {
+    zIndex: theme.zIndex.modal + 1,
+  },
 }));
 
 export default function Header() {
@@ -310,6 +313,7 @@ export default function Header() {
         classes={{ paper: classes.menu }}
         elevation={0}
         keepMounted
+        style={{ zIndex: 1302 }}
       >
         {menuRoutesOptionsValues.map(renderMenuItem)}
       </Menu>
@@ -326,6 +330,7 @@ export default function Header() {
         onClose={() => setDrawerOpen(false)}
         classes={{ paper: classes.drawer }}
       >
+        <div className={classes.toolbarMargin} />
         <List disablePadding>{routesOptionsValues.map(renderListItem)}</List>
       </SwipeableDrawer>
       <IconButton
@@ -340,7 +345,7 @@ export default function Header() {
   return (
     <>
       <ElevationScroll>
-        <AppBar position="fixed">
+        <AppBar position="fixed" className={classes.appBar}>
           <Toolbar disableGutters>
             <Button
               disableRipple
