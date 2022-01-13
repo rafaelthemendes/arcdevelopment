@@ -7,6 +7,8 @@ import {
   Tabs,
   Toolbar,
   useMediaQuery,
+  SwipeableDrawer,
+  IconButton,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
@@ -14,6 +16,9 @@ import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.svg";
 import * as routes from "../../../Routes";
 import ElevationScroll from "./ElevationScroll";
+import MenuIcon from "@material-ui/icons/Menu";
+
+const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 const tabValues = {
   [routes.HOME]: 0,
@@ -93,12 +98,22 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
+  drawerIconContainer: {
+    marginLeft: "auto",
+    "&:hover": {
+      backgroundColor: "transparent",
+    },
+  },
+  drawerIcon: {
+    height: "50px",
+    width: "50px",
+  },
 }));
 
 export default function Header() {
   const classes = useStyles();
   const theme = useTheme();
-  const screenMatchesDownMd = useMediaQuery(theme.breakpoints.down("md"));
+  const screenDownMd = useMediaQuery(theme.breakpoints.down("md"));
 
   const [tabValue, setTabValue] = useState(tabValues[routes.HOME]);
   const [menuItemValue, setMenuItemValue] = useState(
@@ -107,9 +122,9 @@ export default function Header() {
 
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const servicesSelected = tabValue === tabValues[routes.SERVICES];
-  const showTabs = !screenMatchesDownMd;
 
   useEffect(() => {
     const tabIndex = tabValues[window.location.pathname];
@@ -219,6 +234,26 @@ export default function Header() {
     </>
   );
 
+  const drawer = (
+    <>
+      <SwipeableDrawer
+        disableBackdropTransition={!iOS}
+        disableDiscovery={iOS}
+        open={drawerOpen}
+        onOpen={() => setDrawerOpen(true)}
+        onClose={() => setDrawerOpen(false)}
+      >
+        Drawer
+      </SwipeableDrawer>
+      <IconButton
+        className={classes.drawerIconContainer}
+        onClick={() => setDrawerOpen(!drawerOpen)}
+      >
+        <MenuIcon className={classes.drawerIcon} />
+      </IconButton>
+    </>
+  );
+
   return (
     <>
       <ElevationScroll>
@@ -233,7 +268,7 @@ export default function Header() {
             >
               <img alt="company logo" src={logo} className={classes.logo} />
             </Button>
-            {showTabs && tabs}
+            {screenDownMd ? drawer : tabs}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
