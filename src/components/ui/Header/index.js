@@ -9,6 +9,9 @@ import {
   useMediaQuery,
   SwipeableDrawer,
   IconButton,
+  List,
+  ListItem,
+  ListItemText,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
@@ -17,6 +20,7 @@ import logo from "../../../assets/logo.svg";
 import * as routes from "../../../Routes";
 import ElevationScroll from "./ElevationScroll";
 import MenuIcon from "@material-ui/icons/Menu";
+import classNames from "classnames";
 
 const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
@@ -26,6 +30,7 @@ const tabValues = {
   [routes.REVOLUTION]: 2,
   [routes.ABOUT]: 3,
   [routes.CONTACT]: 4,
+  [routes.ESTIMATE]: 5,
 };
 
 const menuItemValues = {
@@ -108,6 +113,20 @@ const useStyles = makeStyles((theme) => ({
     height: "50px",
     width: "50px",
   },
+  drawer: {
+    backgroundColor: theme.palette.common.blue,
+  },
+  drawerItem: {
+    ...theme.typography.tab,
+    color: "white",
+    opacity: 0.7,
+  },
+  drawerItemSelected: {
+    opacity: 1,
+  },
+  drawerItemEstimate: {
+    backgroundColor: theme.palette.common.orange,
+  },
 }));
 
 export default function Header() {
@@ -158,6 +177,11 @@ export default function Header() {
     setMenuOpen(false);
   };
 
+  const handleDrawerItemClick = (index) => {
+    setDrawerOpen(false);
+    setTabValue(index);
+  };
+
   const handleClickLogo = () => {
     setTabValue(tabValues[routes.HOME]);
   };
@@ -204,7 +228,13 @@ export default function Header() {
           to={routes.CONTACT}
         />
       </Tabs>
-      <Button variant="contained" color="secondary" className={classes.button}>
+      <Button
+        variant="contained"
+        color="secondary"
+        className={classes.button}
+        component={Link}
+        to={routes.ESTIMATE}
+      >
         Free Estimate
       </Button>
       <Menu
@@ -242,8 +272,119 @@ export default function Header() {
         open={drawerOpen}
         onOpen={() => setDrawerOpen(true)}
         onClose={() => setDrawerOpen(false)}
+        classes={{ paper: classes.drawer }}
       >
-        Drawer
+        <List disablePadding>
+          <ListItem
+            divider
+            button
+            component={Link}
+            to={routes.HOME}
+            selected={tabValue === tabValues[routes.HOME]}
+            onClick={() => handleDrawerItemClick(tabValues[routes.HOME])}
+          >
+            <ListItemText
+              className={classNames(classes.drawerItem, {
+                [classes.drawerItemSelected]:
+                  tabValue === tabValues[routes.HOME],
+              })}
+              disableTypography
+            >
+              Home
+            </ListItemText>
+          </ListItem>
+          <ListItem
+            divider
+            button
+            component={Link}
+            to={routes.SERVICES}
+            selected={tabValue === tabValues[routes.SERVICES]}
+            onClick={() => handleDrawerItemClick(tabValues[routes.SERVICES])}
+          >
+            <ListItemText
+              className={classNames(classes.drawerItem, {
+                [classes.drawerItemSelected]:
+                  tabValue === tabValues[routes.SERVICES],
+              })}
+              disableTypography
+            >
+              Services
+            </ListItemText>
+          </ListItem>
+          <ListItem
+            divider
+            button
+            component={Link}
+            to={routes.REVOLUTION}
+            selected={tabValue === tabValues[routes.REVOLUTION]}
+            onClick={() => handleDrawerItemClick(tabValues[routes.REVOLUTION])}
+          >
+            <ListItemText
+              className={classNames(classes.drawerItem, {
+                [classes.drawerItemSelected]:
+                  tabValue === tabValues[routes.REVOLUTION],
+              })}
+              disableTypography
+            >
+              The Revolution
+            </ListItemText>
+          </ListItem>
+          <ListItem
+            divider
+            button
+            component={Link}
+            to={routes.ABOUT}
+            selected={tabValue === tabValues[routes.ABOUT]}
+            onClick={() => handleDrawerItemClick(tabValues[routes.ABOUT])}
+          >
+            <ListItemText
+              className={classNames(classes.drawerItem, {
+                [classes.drawerItemSelected]:
+                  tabValue === tabValues[routes.ABOUT],
+              })}
+              disableTypography
+            >
+              About Us
+            </ListItemText>
+          </ListItem>
+          <ListItem
+            divider
+            button
+            component={Link}
+            to={routes.CONTACT}
+            selected={tabValue === tabValues[routes.CONTACT]}
+            onClick={() => handleDrawerItemClick(tabValues[routes.CONTACT])}
+          >
+            <ListItemText
+              className={classNames(classes.drawerItem, {
+                [classes.drawerItemSelected]:
+                  tabValue === tabValues[routes.CONTACT],
+              })}
+              disableTypography
+            >
+              Contact Us
+            </ListItemText>
+          </ListItem>
+          <ListItem
+            className={classes.drawerItemEstimate}
+            divider
+            button
+            component={Link}
+            to={routes.ESTIMATE}
+            selected={tabValue === tabValues[routes.ESTIMATE]}
+            onClick={() => handleDrawerItemClick(tabValues[routes.ESTIMATE])}
+          >
+            <ListItemText
+              className={classNames(classes.drawerItem, {
+                [classes.drawerItemSelected]:
+                  tabValue === tabValues[routes.ESTIMATE],
+              })}
+              disableTypography
+            >
+              Free Estimate
+            </ListItemText>
+          </ListItem>
+        </List>
       </SwipeableDrawer>
       <IconButton
         className={classes.drawerIconContainer}
