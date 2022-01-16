@@ -1,6 +1,6 @@
 # Arc Development Web (Under development)
 
-This project was first bootstrapped with [Create React App](https://github.com/facebook/create-react-app) so that I can practice refactoring an existing project to use [Next.js](https://nextjs.org/).
+This project was first bootstrapped with [Create React App](https://github.com/facebook/create-react-app) so that I can practice refactoring an existing project to use [Next.js](https://nextjs.org/) (Coming Soon).
 
 ## Available Scripts
 
