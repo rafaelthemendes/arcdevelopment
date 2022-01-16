@@ -37,7 +37,7 @@ export const menuRoutesOptions = {
     activeIndex: 1,
   },
   [routes.MOBILE_APPS]: {
-    name: "App Development",
+    name: "iOS/Android App Development",
     link: routes.MOBILE_APPS,
     activeIndex: 2,
   },

@@ -129,7 +129,7 @@ export default function Footer(props) {
                   handleLinkClick(routes.MOBILE_APPS);
                 }}
               >
-                Mobile App Development
+                iOS/Android App Development
               </Grid>
               <Grid
                 item
