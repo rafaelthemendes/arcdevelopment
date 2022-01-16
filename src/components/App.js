@@ -3,6 +3,7 @@ import { useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { homeIndex, servicesMenuIndex } from "../config";
 import * as routes from "../Routes";
+import LandingPage from "./LandingPage";
 import Footer from "./ui/Footer";
 import Header from "./ui/Header";
 import theme from "./ui/Theme";
@@ -21,7 +22,7 @@ function App() {
           setMenuRouteIndex={setMenuRouteIndex}
         />
         <Switch>
-          <Route exact path={routes.HOME} component={() => <div>Home</div>} />
+          <Route exact path={routes.HOME} component={LandingPage} />
           <Route
             exact
             path={routes.SERVICES}
