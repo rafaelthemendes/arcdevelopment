@@ -1,83 +1,36 @@
 import {
   AppBar,
   Button,
-  Menu,
-  MenuItem,
-  Tab,
-  Tabs,
-  Toolbar,
-  useMediaQuery,
-  SwipeableDrawer,
   IconButton,
   List,
   ListItem,
   ListItemText,
+  Menu,
+  MenuItem,
+  SwipeableDrawer,
+  Tab,
+  Tabs,
+  Toolbar,
+  useMediaQuery,
 } from "@material-ui/core";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import MenuIcon from "@material-ui/icons/Menu";
+import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../../assets/logo.svg";
+import {
+  homeIndex,
+  menuRoutesOptions,
+  menuRoutesOptionsValues,
+  routesOptions,
+  routesOptionsValues,
+  servicesIndex,
+} from "../../../config";
 import * as routes from "../../../Routes";
 import ElevationScroll from "./ElevationScroll";
-import MenuIcon from "@material-ui/icons/Menu";
-import classNames from "classnames";
 
 const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-const routesOptions = {
-  [routes.HOME]: { name: "Home", link: routes.HOME, activeIndex: 0 },
-  [routes.SERVICES]: {
-    name: "Services",
-    link: routes.SERVICES,
-    activeIndex: 1,
-  },
-  [routes.REVOLUTION]: {
-    name: "The Revolution",
-    link: routes.REVOLUTION,
-    activeIndex: 2,
-  },
-  [routes.ABOUT]: { name: "About Us", link: routes.ABOUT, activeIndex: 3 },
-  [routes.CONTACT]: {
-    name: "Contact Us",
-    link: routes.CONTACT,
-    activeIndex: 4,
-  },
-  [routes.ESTIMATE]: {
-    name: "Free Estimate",
-    link: routes.ESTIMATE,
-    activeIndex: 5,
-  },
-};
-
-const menuRoutesOptions = {
-  [routes.SERVICES]: {
-    name: "Services",
-    link: routes.SERVICES,
-    activeIndex: 0,
-  },
-  [routes.CUSTOM_SOFTWARE]: {
-    name: "Custom Software Development",
-    link: routes.CUSTOM_SOFTWARE,
-    activeIndex: 1,
-  },
-  [routes.MOBILE_APPS]: {
-    name: "App Development",
-    link: routes.MOBILE_APPS,
-    activeIndex: 2,
-  },
-  [routes.WEBSITES]: {
-    name: "Website Development",
-    link: routes.WEBSITES,
-    activeIndex: 3,
-  },
-};
-
-const homeIndex = routesOptions[routes.HOME].activeIndex;
-const servicesIndex = routesOptions[routes.SERVICES].activeIndex;
-const servicesMenuIndex = menuRoutesOptions[routes.SERVICES].activeIndex;
-
-const routesOptionsValues = Object.values(routesOptions);
-const menuRoutesOptionsValues = Object.values(menuRoutesOptions);
 
 const useStyles = makeStyles((theme) => ({
   toolbarMargin: {
@@ -161,13 +114,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Header() {
+export default function Header(props) {
+  const { routeIndex, setRouteIndex, menuRouteIndex, setMenuRouteIndex } =
+    props;
+
   const classes = useStyles();
   const theme = useTheme();
   const screenDownMd = useMediaQuery(theme.breakpoints.down("md"));
-
-  const [routeIndex, setRouteIndex] = useState(homeIndex);
-  const [menuRouteIndex, setMenuRouteIndex] = useState(servicesMenuIndex);
 
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -185,7 +138,7 @@ export default function Header() {
     } else if (routeOption) {
       setRouteIndex(routeOption.activeIndex);
     }
-  }, []);
+  }, [setMenuRouteIndex, setRouteIndex]);
 
   const handleTabChange = (_, newValue) => {
     setRouteIndex(newValue);

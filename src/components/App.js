@@ -1,15 +1,25 @@
 import { ThemeProvider } from "@material-ui/core/styles";
+import { useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { homeIndex, servicesMenuIndex } from "../config";
 import * as routes from "../Routes";
 import Footer from "./ui/Footer";
 import Header from "./ui/Header";
 import theme from "./ui/Theme";
 
 function App() {
+  const [routeIndex, setRouteIndex] = useState(homeIndex);
+  const [menuRouteIndex, setMenuRouteIndex] = useState(servicesMenuIndex);
+
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
-        <Header />
+        <Header
+          routeIndex={routeIndex}
+          setRouteIndex={setRouteIndex}
+          menuRouteIndex={menuRouteIndex}
+          setMenuRouteIndex={setMenuRouteIndex}
+        />
         <Switch>
           <Route exact path={routes.HOME} component={() => <div>Home</div>} />
           <Route
@@ -53,7 +63,10 @@ function App() {
             component={() => <div>Estimate</div>}
           />
         </Switch>
-        <Footer />
+        <Footer
+          setRouteIndex={setRouteIndex}
+          setMenuRouteIndex={setMenuRouteIndex}
+        />
       </BrowserRouter>
     </ThemeProvider>
   );
